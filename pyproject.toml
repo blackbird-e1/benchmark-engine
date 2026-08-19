@@ -8,10 +8,14 @@ version = "0.1.0"
 description = "A domain-agnostic benchmark engine for comparing metrics against defined benchmarks."
 readme = "README.md"
 requires-python = ">=3.10"
+
 authors = [
     { name = "Blackbird E1" }
 ]
+
 license = "MIT"
+license-files = ["LICENSE"]
+
 keywords = [
     "benchmark",
     "benchmarking",
@@ -19,10 +23,10 @@ keywords = [
     "scoring",
     "evaluation",
 ]
+
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -31,6 +35,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Libraries",
 ]
+
 dependencies = []
 
 [project.urls]
