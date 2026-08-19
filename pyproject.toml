@@ -1,13 +1,42 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "benchmark-engine"
 version = "0.1.0"
-description = "A domain-agnostic benchmark engine"
+description = "A domain-agnostic benchmark engine for comparing metrics against defined benchmarks."
+readme = "README.md"
 requires-python = ">=3.10"
+authors = [
+    { name = "Blackbird E1" }
+]
+license = "MIT"
+keywords = [
+    "benchmark",
+    "benchmarking",
+    "metrics",
+    "scoring",
+    "evaluation",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries",
+]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/blackbird-e1/benchmark-engine"
+Repository = "https://github.com/blackbird-e1/benchmark-engine"
+Issues = "https://github.com/blackbird-e1/benchmark-engine/issues"
 
 [tool.setuptools.packages.find]
 include = ["benchmark_engine*"]
