@@ -1,4 +1,5 @@
 """Domain-agnostic benchmark engine."""
+
 from typing import Dict
 
 from .core.comparison import compare_metrics
@@ -6,6 +7,7 @@ from .core.models import (
     BenchmarkInput,
     BenchmarkResult,
     MetricRule,
+    RuleType,
 )
 from .core.scoring import calculate_score
 
@@ -36,4 +38,5 @@ __all__ = [
     "BenchmarkInput",
     "BenchmarkResult",
     "MetricRule",
+    "RuleType",
 ]
