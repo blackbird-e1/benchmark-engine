@@ -433,3 +433,191 @@ def test_result_contains_benchmark_information():
     assert metric.deviation == 5
     assert metric.status == "ABOVE_LIMIT"
     assert metric.score == pytest.approx(0.5)
+
+def test_maximum_rule_exactly_at_limit():
+    rules = {
+        "bank_angle": MetricRule(
+            name="bank_angle",
+            rule_type=RuleType.MAXIMUM,
+            maximum=30,
+            tolerance=10,
+        )
+    }
+
+    engine = BenchmarkEngine(rules)
+
+    result = engine.evaluate(
+        BenchmarkInput(
+            metrics={
+                "bank_angle": 30,
+            }
+        )
+    )
+
+    assert result.metrics["bank_angle"].score == 1.0
+    assert result.metrics["bank_angle"].status == "WITHIN_LIMIT"
+    assert result.metrics["bank_angle"].deviation == 0
+
+
+def test_minimum_rule_exactly_at_limit():
+    rules = {
+        "airspeed": MetricRule(
+            name="airspeed",
+            rule_type=RuleType.MINIMUM,
+            minimum=120,
+            tolerance=20,
+        )
+    }
+
+    engine = BenchmarkEngine(rules)
+
+    result = engine.evaluate(
+        BenchmarkInput(
+            metrics={
+                "airspeed": 120,
+            }
+        )
+    )
+
+    assert result.metrics["airspeed"].score == 1.0
+    assert result.metrics["airspeed"].status == "WITHIN_LIMIT"
+    assert result.metrics["airspeed"].deviation == 0
+
+def test_range_rule_exactly_at_lower_boundary():
+    rules = {
+        "altitude": MetricRule(
+            name="altitude",
+            rule_type=RuleType.RANGE,
+            minimum=28000,
+            maximum=32000,
+            tolerance=2000,
+        )
+    }
+
+    result = BenchmarkEngine(rules).evaluate(
+        BenchmarkInput(metrics={"altitude": 28000})
+    )
+
+    assert result.metrics["altitude"].score == 1.0
+    assert result.metrics["altitude"].status == "WITHIN_RANGE"
+    assert result.metrics["altitude"].deviation == 0
+
+
+def test_range_rule_exactly_at_upper_boundary():
+    rules = {
+        "altitude": MetricRule(
+            name="altitude",
+            rule_type=RuleType.RANGE,
+            minimum=28000,
+            maximum=32000,
+            tolerance=2000,
+        )
+    }
+
+    result = BenchmarkEngine(rules).evaluate(
+        BenchmarkInput(metrics={"altitude": 32000})
+    )
+
+    assert result.metrics["altitude"].score == 1.0
+    assert result.metrics["altitude"].status == "WITHIN_RANGE"
+    assert result.metrics["altitude"].deviation == 0
+
+def test_range_rule_rejects_invalid_bounds():
+    rules = {
+        "altitude": MetricRule(
+            name="altitude",
+            rule_type=RuleType.RANGE,
+            minimum=32000,
+            maximum=28000,
+        )
+    }
+
+    with pytest.raises(ValueError, match="minimum greater than maximum"):
+        BenchmarkEngine(rules).evaluate(
+            BenchmarkInput(metrics={"altitude": 30000})
+        )
+
+def test_target_rule_below_target():
+    rules = {
+        "descent_rate": MetricRule(
+            name="descent_rate",
+            rule_type=RuleType.TARGET,
+            target=1000,
+            tolerance=200,
+        )
+    }
+
+    result = BenchmarkEngine(rules).evaluate(
+        BenchmarkInput(metrics={"descent_rate": 900})
+    )
+
+    assert result.metrics["descent_rate"].score == pytest.approx(0.5)
+    assert result.metrics["descent_rate"].status == "OFF_TARGET"
+    assert result.metrics["descent_rate"].deviation == -100
+
+
+def test_target_rule_above_target():
+    rules = {
+        "descent_rate": MetricRule(
+            name="descent_rate",
+            rule_type=RuleType.TARGET,
+            target=1000,
+            tolerance=200,
+        )
+    }
+
+    result = BenchmarkEngine(rules).evaluate(
+        BenchmarkInput(metrics={"descent_rate": 1100})
+    )
+
+    assert result.metrics["descent_rate"].score == pytest.approx(0.5)
+    assert result.metrics["descent_rate"].status == "OFF_TARGET"
+    assert result.metrics["descent_rate"].deviation == 100
+
+def test_zero_total_weight_returns_zero_score():
+    rules = {
+        "metric_a": MetricRule(
+            name="metric_a",
+            rule_type=RuleType.MAXIMUM,
+            maximum=100,
+            weight=0,
+        ),
+        "metric_b": MetricRule(
+            name="metric_b",
+            rule_type=RuleType.MAXIMUM,
+            maximum=100,
+            weight=0,
+        ),
+    }
+
+    result = BenchmarkEngine(rules).evaluate(
+        BenchmarkInput(
+            metrics={
+                "metric_a": 50,
+                "metric_b": 50,
+            }
+        )
+    )
+
+    assert result.score == 0.0
+
+def test_unmatched_input_metric_is_ignored():
+    rules = {
+        "known_metric": MetricRule(
+            name="known_metric",
+            rule_type=RuleType.MAXIMUM,
+            maximum=100,
+        )
+    }
+
+    result = BenchmarkEngine(rules).evaluate(
+        BenchmarkInput(
+            metrics={
+                "known_metric": 50,
+                "unknown_metric": 999,
+            }
+        )
+    )
+
+    assert "known_metric" in result.metrics
+    assert "unknown_metric" not in result.metrics
