@@ -11,10 +11,18 @@ st.set_page_config(
 )
 
 st.title("Benchmark Engine")
-st.write("Benchmark a Python implementation against a defined reference profile.")
+
+st.subheader("Coding Benchmark")
+st.write(
+    "Evaluate a Python implementation against the defined coding benchmark rules."
+)
+
+st.caption(
+    "Current benchmark profile: Python coding / calculator implementations."
+)
 
 uploaded_file = st.file_uploader(
-    "Upload a Python file",
+    "Upload a Python implementation",
     type=["py"],
 )
 
